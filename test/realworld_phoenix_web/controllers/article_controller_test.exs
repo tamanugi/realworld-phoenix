@@ -4,6 +4,8 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   alias RealworldPhoenix.Articles
   alias RealworldPhoenix.Articles.Article
 
+  @tag_candinates ~w(Elixir Rust Go Java Node Ruby)
+
   @create_attrs %{
     body: "some body",
     description: "some description",
@@ -29,8 +31,11 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     title: nil
   }
 
-  def fixture(:article) do
-    {:ok, article} = Articles.create_article(@create_attrs)
+  def fixture(:article, tags \\ []) do
+    {:ok, article} =
+      Map.update!(@create_attrs, :tagList, fn _ -> tags end)
+      |> Articles.create_article()
+
     article
   end
 
@@ -39,9 +44,21 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "index" do
+    setup [:create_articles]
+
     test "lists all articles", %{conn: conn} do
       conn = get(conn, Routes.article_path(conn, :index))
-      assert json_response(conn, 200)["articles"] == []
+      assert json_response(conn, 200)["articles"] |> length() == length(@tag_candinates)
+    end
+
+    test "filtering by tag", %{conn: conn} do
+      conn = get(conn, Routes.article_path(conn, :index), tag: "Elixir")
+
+      assert [
+               %{
+                 "tagList" => ["Elixir"]
+               }
+             ] = json_response(conn, 200)["articles"]
     end
   end
 
@@ -115,5 +132,12 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   defp create_article(_) do
     article = fixture(:article)
     %{article: article}
+  end
+
+  defp create_articles(_) do
+    @tag_candinates
+    |> Enum.each(fn tag ->
+      fixture(:article, [tag])
+    end)
   end
 end

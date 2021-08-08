@@ -17,9 +17,16 @@ defmodule RealworldPhoenix.Articles do
       [%Article{}, ...]
 
   """
-  def list_articles do
+  def list_articles() do
     Repo.all(Article)
   end
+
+  def list_articles(%{"tag" => tag}) do
+    from(a in Article, where: ^tag in a.tagList)
+    |> Repo.all()
+  end
+
+  def list_articles(%{}), do: list_articles()
 
   @doc """
   Gets a single article.

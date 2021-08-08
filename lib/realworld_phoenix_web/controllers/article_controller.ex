@@ -6,8 +6,8 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
   action_fallback RealworldPhoenixWeb.FallbackController
 
-  def index(conn, _params) do
-    articles = Articles.list_articles()
+  def index(conn, params) do
+    articles = Articles.list_articles(params)
     render(conn, "index.json", articles: articles)
   end
 
