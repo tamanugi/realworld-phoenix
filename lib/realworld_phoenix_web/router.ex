@@ -20,9 +20,15 @@ defmodule RealworldPhoenixWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", RealworldPhoenixWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", RealworldPhoenixWeb do
+    pipe_through :api
+
+    get "/articles", ArticleController, :index
+    get "/articles/:slug", ArticleController, :show
+    post "/articles", ArticleController, :create
+    put "/articles/:slug", ArticleController, :update
+    delete "/articles/:slug", ArticleController, :delete
+  end
 
   # Enables LiveDashboard only for development
   #

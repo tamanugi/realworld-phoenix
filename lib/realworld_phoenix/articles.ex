@@ -37,6 +37,10 @@ defmodule RealworldPhoenix.Articles do
   """
   def get_article!(id), do: Repo.get!(Article, id)
 
+  def get_article_by_slug!(slug) do
+    Repo.get_by!(Article, slug: slug)
+  end
+
   @doc """
   Creates a article.
 

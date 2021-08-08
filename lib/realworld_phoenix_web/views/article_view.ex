@@ -3,7 +3,7 @@ defmodule RealworldPhoenixWeb.ArticleView do
   alias RealworldPhoenixWeb.ArticleView
 
   def render("index.json", %{articles: articles}) do
-    %{data: render_many(articles, ArticleView, "article.json")}
+    %{articles: render_many(articles, ArticleView, "article.json")}
   end
 
   def render("show.json", %{article: article}) do
@@ -11,13 +11,13 @@ defmodule RealworldPhoenixWeb.ArticleView do
   end
 
   def render("article.json", %{article: article}) do
-    %{id: article.id,
-      id: article.id,
+    %{
       slug: article.slug,
       title: article.title,
       description: article.description,
       body: article.body,
       tagList: article.tagList,
-      favoritesCount: article.favoritesCount}
+      favoritesCount: article.favoritesCount
+    }
   end
 end

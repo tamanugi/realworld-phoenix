@@ -6,9 +6,30 @@ defmodule RealworldPhoenix.ArticlesTest do
   describe "articles" do
     alias RealworldPhoenix.Articles.Article
 
-    @valid_attrs %{body: "some body", description: "some description", favoritesCount: 42, id: "7488a646-e31f-11e4-aace-600308960662", slug: "some slug", tagList: [], title: "some title"}
-    @update_attrs %{body: "some updated body", description: "some updated description", favoritesCount: 43, id: "7488a646-e31f-11e4-aace-600308960668", slug: "some updated slug", tagList: [], title: "some updated title"}
-    @invalid_attrs %{body: nil, description: nil, favoritesCount: nil, id: nil, slug: nil, tagList: nil, title: nil}
+    @valid_attrs %{
+      body: "some body",
+      description: "some description",
+      favoritesCount: 42,
+      slug: "some slug",
+      tagList: [],
+      title: "some title"
+    }
+    @update_attrs %{
+      body: "some updated body",
+      description: "some updated description",
+      favoritesCount: 43,
+      slug: "some updated slug",
+      tagList: [],
+      title: "some updated title"
+    }
+    @invalid_attrs %{
+      body: nil,
+      description: nil,
+      favoritesCount: nil,
+      slug: nil,
+      tagList: nil,
+      title: nil
+    }
 
     def article_fixture(attrs \\ %{}) do
       {:ok, article} =
@@ -34,7 +55,6 @@ defmodule RealworldPhoenix.ArticlesTest do
       assert article.body == "some body"
       assert article.description == "some description"
       assert article.favoritesCount == 42
-      assert article.id == "7488a646-e31f-11e4-aace-600308960662"
       assert article.slug == "some slug"
       assert article.tagList == []
       assert article.title == "some title"
@@ -50,7 +70,6 @@ defmodule RealworldPhoenix.ArticlesTest do
       assert article.body == "some updated body"
       assert article.description == "some updated description"
       assert article.favoritesCount == 43
-      assert article.id == "7488a646-e31f-11e4-aace-600308960668"
       assert article.slug == "some updated slug"
       assert article.tagList == []
       assert article.title == "some updated title"
