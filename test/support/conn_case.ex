@@ -17,6 +17,8 @@ defmodule RealworldPhoenixWeb.ConnCase do
 
   use ExUnit.CaseTemplate
 
+  alias RealworldPhoenix.Accounts
+
   using do
     quote do
       # Import conveniences for testing with connections
@@ -39,5 +41,22 @@ defmodule RealworldPhoenixWeb.ConnCase do
     end
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
+  end
+
+  def put_authorization(%Plug.Conn{} = conn, user \\ nil) do
+    user =
+      case user do
+        %RealworldPhoenix.Accounts.User{} ->
+          user
+
+        _ ->
+          {:ok, user} = Accounts.create_user(%{username: "hoge", email: "hoge", password: "hoge"})
+          user
+      end
+
+    {:ok, token, _} = RealworldPhoenix.Guardian.encode_and_sign(user, %{})
+
+    conn
+    |> Plug.Conn.put_req_header("authorization", "Bearer " <> token)
   end
 end

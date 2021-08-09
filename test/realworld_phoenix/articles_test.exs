@@ -2,9 +2,18 @@ defmodule RealworldPhoenix.ArticlesTest do
   use RealworldPhoenix.DataCase
 
   alias RealworldPhoenix.Articles
+  alias RealworldPhoenix.Repo
 
   describe "articles" do
     alias RealworldPhoenix.Articles.Article
+
+    @valid_user %{
+      username: "author",
+      email: "email",
+      bio: "bio",
+      password: "hoge",
+      image: "image_url"
+    }
 
     @valid_attrs %{
       body: "some body",
@@ -12,7 +21,8 @@ defmodule RealworldPhoenix.ArticlesTest do
       favoritesCount: 42,
       slug: "some slug",
       tagList: [],
-      title: "some title"
+      title: "some title",
+      author: @valid_user
     }
     @update_attrs %{
       body: "some updated body",
@@ -37,7 +47,7 @@ defmodule RealworldPhoenix.ArticlesTest do
         |> Enum.into(@valid_attrs)
         |> Articles.create_article()
 
-      article
+      article |> Repo.preload(:author)
     end
 
     test "list_articles/0 returns all articles" do

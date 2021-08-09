@@ -13,27 +13,42 @@ defmodule RealworldPhoenixWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :require_authenticated do
+    plug Guardian.Plug.Pipeline,
+      module: RealworldPhoenix.Guardian,
+      error_handler: RealworldPhoenixWeb.AuthErrorHandler
+
+    plug Guardian.Plug.VerifySession
+    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.EnsureAuthenticated
+    plug Guardian.Plug.LoadResource, allow_blank: true
+  end
+
   scope "/", RealworldPhoenixWeb do
     pipe_through :browser
 
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
+  # Not required Authenticated
   scope "/api", RealworldPhoenixWeb do
     pipe_through :api
 
     get "/articles", ArticleController, :index
     get "/articles/:slug", ArticleController, :show
+    post "/users/login", UserController, :login
+    post "/users", UserController, :create
+  end
+
+  # required Authenticated
+  scope "/api", RealworldPhoenixWeb do
+    pipe_through [:api, :require_authenticated]
+
+    get "/user", UserController, :show
+    put "/user", UserController, :update
     post "/articles", ArticleController, :create
     put "/articles/:slug", ArticleController, :update
     delete "/articles/:slug", ArticleController, :delete
-  end
-
-  scope "/api", RealworldPhoenixWeb do
-    pipe_through :api
-
-    post "/users/login", UserController, :login
   end
 
   # Enables LiveDashboard only for development

@@ -6,9 +6,21 @@ defmodule RealworldPhoenix.AccountsTest do
   describe "users" do
     alias RealworldPhoenix.Accounts.User
 
-    @valid_attrs %{bio: "some bio", email: "some email", image: "some image", username: "some username"}
-    @update_attrs %{bio: "some updated bio", email: "some updated email", image: "some updated image", username: "some updated username"}
-    @invalid_attrs %{bio: nil, email: nil, image: nil, username: nil}
+    @valid_attrs %{
+      bio: "some bio",
+      email: "some email",
+      image: "some image",
+      username: "some username",
+      password: "hogehoge"
+    }
+    @update_attrs %{
+      bio: "some updated bio",
+      email: "some updated email",
+      image: "some updated image",
+      username: "some updated username",
+      password: "updatehogehoge"
+    }
+    @invalid_attrs %{bio: nil, email: nil, image: nil, username: nil, password: nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =

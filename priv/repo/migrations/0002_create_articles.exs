@@ -9,6 +9,7 @@ defmodule RealworldPhoenix.Repo.Migrations.CreateArticles do
       add :body, :string
       add :tagList, {:array, :string}
       add :favoritesCount, :integer
+      add :author_id, references(:users)
 
       timestamps()
     end

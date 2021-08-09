@@ -14,17 +14,6 @@ alias RealworldPhoenix.Repo
 alias RealworldPhoenix.Articles.Article
 alias RealworldPhoenix.Accounts.User
 
-article = %Article{
-  slug: "how-to-train-your-dragon",
-  title: "How to train your dragon",
-  description: "Ever wonder how?",
-  body: "It takes a Jacobian",
-  tagList: ["dragons", "training"],
-  favoritesCount: 0
-}
-
-Repo.insert!(article)
-
 user = %User{
   email: "hoge@example.com",
   username: "username",
@@ -35,3 +24,18 @@ changeset =
   User.changeset(%User{}, %{email: "hoge@xample.com", username: "username", password: "password"})
 
 Repo.insert!(changeset)
+
+1..10
+|> Enum.each(fn i ->
+  article = %Article{
+    slug: "how-to-train-your-dragon-#{i}",
+    title: "How to train your dragon #{i}",
+    description: "Ever wonder how?",
+    body: "It takes a Jacobian",
+    tagList: ["dragons", "training"],
+    favoritesCount: 0,
+    author_id: user.id
+  }
+
+  Repo.insert!(article)
+end)

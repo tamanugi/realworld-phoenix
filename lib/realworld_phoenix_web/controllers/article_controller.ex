@@ -12,7 +12,9 @@ defmodule RealworldPhoenixWeb.ArticleController do
   end
 
   def create(conn, %{"article" => article_params}) do
-    with {:ok, %Article{} = article} <- Articles.create_article(article_params) do
+    with user <- Guardian.Plug.current_resource(conn),
+         article_params <- Map.put(article_params, "author_id", user.id),
+         {:ok, %Article{} = article} <- Articles.create_article(article_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.article_path(conn, :show, article))

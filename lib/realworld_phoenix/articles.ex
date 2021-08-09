@@ -18,11 +18,14 @@ defmodule RealworldPhoenix.Articles do
 
   """
   def list_articles() do
-    Repo.all(Article)
+    Article
+    |> preload(:author)
+    |> Repo.all()
   end
 
   def list_articles(%{"tag" => tag}) do
     from(a in Article, where: ^tag in a.tagList)
+    |> preload(:author)
     |> Repo.all()
   end
 
@@ -42,7 +45,7 @@ defmodule RealworldPhoenix.Articles do
       ** (Ecto.NoResultsError)
 
   """
-  def get_article!(id), do: Repo.get!(Article, id)
+  def get_article!(id), do: Repo.get!(Article, id) |> Repo.preload(:author)
 
   def get_article_by_slug!(slug) do
     Repo.get_by!(Article, slug: slug)

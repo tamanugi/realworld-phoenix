@@ -63,9 +63,11 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "create article" do
+    setup [:login]
+
     test "renders article when data is valid", %{conn: conn} do
       conn = post(conn, Routes.article_path(conn, :create), article: @create_attrs)
-      assert %{"slug" => id} = json_response(conn, 201)["data"]
+      assert %{"slug" => id} = json_response(conn, 201)["article"]
 
       conn = get(conn, Routes.article_path(conn, :show, id))
 
@@ -76,7 +78,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
                "slug" => "some slug",
                "tagList" => [],
                "title" => "some title"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)["article"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -86,14 +88,14 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "update article" do
-    setup [:create_article]
+    setup [:create_article, :login]
 
     test "renders article when data is valid", %{
       conn: conn,
       article: %Article{slug: id} = article
     } do
       conn = put(conn, Routes.article_path(conn, :update, id), article: @update_attrs)
-      assert %{"slug" => id} = json_response(conn, 200)["data"]
+      assert %{"slug" => id} = json_response(conn, 200)["article"]
 
       conn = get(conn, Routes.article_path(conn, :show, id))
 
@@ -104,7 +106,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
                "slug" => "some updated slug",
                "tagList" => [],
                "title" => "some updated title"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)["article"]
     end
 
     test "renders errors when data is invalid", %{
@@ -117,7 +119,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "delete article" do
-    setup [:create_article]
+    setup [:create_article, :login]
 
     test "deletes chosen article", %{conn: conn, article: %Article{slug: id} = article} do
       conn = delete(conn, Routes.article_path(conn, :delete, id))
@@ -139,5 +141,10 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     |> Enum.each(fn tag ->
       fixture(:article, [tag])
     end)
+  end
+
+  defp login(%{conn: conn}) do
+    conn = put_authorization(conn)
+    %{conn: conn}
   end
 end

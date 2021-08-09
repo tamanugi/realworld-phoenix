@@ -4,24 +4,27 @@ defmodule RealworldPhoenixWeb.UserController do
   alias RealworldPhoenix.Accounts
   alias RealworldPhoenix.Accounts.User
 
+  import RealworldPhoenix.Guardian
+
   action_fallback RealworldPhoenixWeb.FallbackController
 
   def create(conn, %{"user" => user_params}) do
     with {:ok, %User{} = user} <- Accounts.create_user(user_params) do
+      {:ok, token, _} = encode_and_sign(user)
+
       conn
-      |> put_status(:created)
-      |> put_resp_header("location", Routes.user_path(conn, :show, user))
-      |> render("show.json", user: user)
+      |> render("user.json", user: user, token: token)
     end
   end
 
-  def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    render(conn, "show.json", user: user)
+  def show(conn, _) do
+    user = Guardian.Plug.current_resource(conn)
+    render(conn, "user.json", user: user)
   end
 
-  def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Accounts.get_user!(id)
+  def update(conn, %{"user" => user_params}) do
+    # user = Accounts.get_user!(id)
+    user = Guardian.Plug.current_resource(conn)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
       render(conn, "show.json", user: user)
@@ -40,8 +43,12 @@ defmodule RealworldPhoenixWeb.UserController do
     user = Accounts.get_user_by_email(email)
 
     case Bcrypt.check_pass(user, password, hash_key: :password) do
-      {:error, msg} -> send_resp(conn, :unauthorized, msg)
-      _ -> render(conn, "show.json", user: user)
+      {:error, msg} ->
+        send_resp(conn, :unauthorized, msg)
+
+      _ ->
+        {:ok, token, _} = encode_and_sign(user)
+        render(conn, "user.json", user: user, token: token)
     end
   end
 end

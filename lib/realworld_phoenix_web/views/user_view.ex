@@ -10,6 +10,11 @@ defmodule RealworldPhoenixWeb.UserView do
     %{data: render_one(user, UserView, "user.json")}
   end
 
+  def render("user.json", %{user: user, token: token}) do
+    render("user.json", %{user: user})
+    |> Map.put_new(:token, token)
+  end
+
   def render("user.json", %{user: user}) do
     %{
       email: user.email,

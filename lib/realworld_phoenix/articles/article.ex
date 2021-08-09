@@ -2,6 +2,8 @@ defmodule RealworldPhoenix.Articles.Article do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias RealworldPhoenix.Accounts.User
+
   schema "articles" do
     field :body, :string
     field :description, :string
@@ -9,6 +11,7 @@ defmodule RealworldPhoenix.Articles.Article do
     field :slug, :string
     field :tagList, {:array, :string}
     field :title, :string
+    belongs_to :author, User
 
     timestamps()
   end
@@ -16,7 +19,8 @@ defmodule RealworldPhoenix.Articles.Article do
   @doc false
   def changeset(article, attrs) do
     article
-    |> cast(attrs, [:slug, :title, :description, :body, :tagList, :favoritesCount])
+    |> cast(attrs, [:slug, :title, :description, :body, :tagList, :favoritesCount, :author_id])
+    |> cast_assoc(:author)
     |> validate_required([:slug, :title, :description, :body, :tagList, :favoritesCount])
   end
 end
