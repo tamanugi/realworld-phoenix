@@ -30,6 +30,12 @@ defmodule RealworldPhoenixWeb.Router do
     delete "/articles/:slug", ArticleController, :delete
   end
 
+  scope "/api", RealworldPhoenixWeb do
+    pipe_through :api
+
+    post "/users/login", UserController, :login
+  end
+
   # Enables LiveDashboard only for development
   #
   # If you want to use the LiveDashboard in production, you should put

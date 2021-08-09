@@ -10,7 +10,11 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-article = %RealworldPhoenix.Articles.Article{
+alias RealworldPhoenix.Repo
+alias RealworldPhoenix.Articles.Article
+alias RealworldPhoenix.Accounts.User
+
+article = %Article{
   slug: "how-to-train-your-dragon",
   title: "How to train your dragon",
   description: "Ever wonder how?",
@@ -19,4 +23,15 @@ article = %RealworldPhoenix.Articles.Article{
   favoritesCount: 0
 }
 
-RealworldPhoenix.Repo.insert!(article)
+Repo.insert!(article)
+
+user = %User{
+  email: "hoge@example.com",
+  username: "username",
+  password: "password"
+}
+
+changeset =
+  User.changeset(%User{}, %{email: "hoge@xample.com", username: "username", password: "password"})
+
+Repo.insert!(changeset)
