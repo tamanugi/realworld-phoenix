@@ -57,6 +57,6 @@ defmodule RealworldPhoenixWeb.ConnCase do
     {:ok, token, _} = RealworldPhoenix.Guardian.encode_and_sign(user, %{})
 
     conn
-    |> Plug.Conn.put_req_header("authorization", "Bearer " <> token)
+    |> Plug.Conn.put_req_header("authorization", "Token " <> token)
   end
 end

@@ -13,13 +13,14 @@ defmodule RealworldPhoenixWeb.UserController do
       {:ok, token, _} = encode_and_sign(user)
 
       conn
-      |> render("user.json", user: user, token: token)
+      |> render("show.json", user: user, token: token)
     end
   end
 
   def show(conn, _) do
     user = Guardian.Plug.current_resource(conn)
-    render(conn, "user.json", user: user)
+    {:ok, token, _} = encode_and_sign(user)
+    render(conn, "show.json", user: user, token: token)
   end
 
   def update(conn, %{"user" => user_params}) do
@@ -27,7 +28,8 @@ defmodule RealworldPhoenixWeb.UserController do
     user = Guardian.Plug.current_resource(conn)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
-      render(conn, "show.json", user: user)
+      {:ok, token, _} = encode_and_sign(user)
+      render(conn, "show.json", user: user, token: token)
     end
   end
 
@@ -39,7 +41,7 @@ defmodule RealworldPhoenixWeb.UserController do
     end
   end
 
-  def login(conn, %{"email" => email, "password" => password}) do
+  def login(conn, %{"user" => %{"email" => email, "password" => password}}) do
     user = Accounts.get_user_by_email(email)
 
     case Bcrypt.check_pass(user, password, hash_key: :password) do
@@ -48,7 +50,7 @@ defmodule RealworldPhoenixWeb.UserController do
 
       _ ->
         {:ok, token, _} = encode_and_sign(user)
-        render(conn, "user.json", user: user, token: token)
+        render(conn, "show.json", user: user, token: token)
     end
   end
 end

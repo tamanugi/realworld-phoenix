@@ -34,10 +34,12 @@ defmodule RealworldPhoenixWeb.UserControllerTest do
       conn = post(conn, Routes.user_path(conn, :create), user: @create_attrs)
 
       assert %{
-               "bio" => nil,
-               "email" => "some email",
-               "image" => nil,
-               "username" => "some username"
+               "user" => %{
+                 "bio" => nil,
+                 "email" => "some email",
+                 "image" => nil,
+                 "username" => "some username"
+               }
              } = json_response(conn, 200)
     end
 
@@ -60,11 +62,16 @@ defmodule RealworldPhoenixWeb.UserControllerTest do
       conn = get(conn, Routes.user_path(conn, :show))
 
       assert %{
-               "bio" => "some updated bio",
-               "email" => "some updated email",
-               "image" => "some updated image",
-               "username" => "some updated username"
+               "user" => %{
+                 "bio" => "some updated bio",
+                 "email" => "some updated email",
+                 "image" => "some updated image",
+                 "username" => "some updated username",
+                 "token" => token
+               }
              } = json_response(conn, 200)
+
+      assert is_binary(token)
     end
 
     test "renders errors when data is invalid", %{conn: conn, user: user} do
@@ -81,23 +88,38 @@ defmodule RealworldPhoenixWeb.UserControllerTest do
 
     test "login success valid password", %{conn: conn, user: user} do
       conn =
-        post(conn, Routes.user_path(conn, :login), email: user.email, password: "hogehogehoge")
+        post(conn, Routes.user_path(conn, :login),
+          user: %{email: user.email, password: "hogehogehoge"}
+        )
 
       assert response(conn, 200)
 
-      %{"token" => token} = json_response(conn, 200)
+      %{"user" => %{"token" => token}} = json_response(conn, 200)
 
       conn =
         conn
         |> recycle()
-        |> put_req_header("authorization", "Bearer " <> token)
+        |> put_req_header("authorization", "Token " <> token)
         |> get(Routes.user_path(conn, :show))
 
-      assert json_response(conn, 200)
+      assert %{
+               "user" => %{
+                 "bio" => nil,
+                 "email" => "some email",
+                 "image" => nil,
+                 "username" => "some username",
+                 "token" => token
+               }
+             } = json_response(conn, 200)
+
+      assert is_binary(token)
     end
 
     test "login failed invalid password", %{conn: conn, user: user} do
-      conn = post(conn, Routes.user_path(conn, :login), email: user.email, password: "hogehoge")
+      conn =
+        post(conn, Routes.user_path(conn, :login),
+          user: %{email: user.email, password: "hogehoge"}
+        )
 
       assert response(conn, 401)
     end

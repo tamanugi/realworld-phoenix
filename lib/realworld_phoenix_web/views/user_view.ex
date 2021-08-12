@@ -3,11 +3,11 @@ defmodule RealworldPhoenixWeb.UserView do
   alias RealworldPhoenixWeb.UserView
 
   def render("index.json", %{users: users}) do
-    %{data: render_many(users, UserView, "user.json")}
+    %{user: render_many(users, UserView, "user.json")}
   end
 
-  def render("show.json", %{user: user}) do
-    %{data: render_one(user, UserView, "user.json")}
+  def render("show.json", %{user: user} = params) do
+    %{user: render_one(user, UserView, "user.json", params)}
   end
 
   def render("user.json", %{user: user, token: token}) do

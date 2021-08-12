@@ -19,7 +19,7 @@ defmodule RealworldPhoenixWeb.Router do
       error_handler: RealworldPhoenixWeb.AuthErrorHandler
 
     plug Guardian.Plug.VerifySession
-    plug Guardian.Plug.VerifyHeader
+    plug Guardian.Plug.VerifyHeader, scheme: "Token"
     plug Guardian.Plug.EnsureAuthenticated
     plug Guardian.Plug.LoadResource, allow_blank: true
   end
