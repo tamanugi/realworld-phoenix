@@ -3,6 +3,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
 
   alias RealworldPhoenix.Articles
   alias RealworldPhoenix.Articles.Article
+  alias RealworldPhoenix.Accounts
 
   @tag_candinates ~w(Elixir Rust Go Java Node Ruby)
 
@@ -31,12 +32,26 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     title: nil
   }
 
-  def fixture(:article, tags \\ []) do
+  @valid_user_attrs %{
+    username: "username",
+    bio: "bio",
+    image: "image",
+    email: "email",
+    password: "password"
+  }
+
+  def fixture(:article, authorId, tags \\ []) do
     {:ok, article} =
       Map.update!(@create_attrs, :tagList, fn _ -> tags end)
+      |> Map.put(:author_id, authorId)
       |> Articles.create_article()
 
     article
+  end
+
+  def fixture(:user) do
+    {:ok, user} = Accounts.create_user(@valid_user_attrs)
+    user
   end
 
   setup %{conn: conn} do
@@ -44,11 +59,29 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "index" do
-    setup [:create_articles]
+    setup [:login, :create_articles]
 
     test "lists all articles", %{conn: conn} do
       conn = get(conn, Routes.article_path(conn, :index))
-      assert json_response(conn, 200)["articles"] |> length() == length(@tag_candinates)
+
+      %{"articles" => articles, "articleCount" => articleCount} = json_response(conn, 200)
+      assert articles |> length() == length(@tag_candinates)
+      assert articleCount == length(@tag_candinates)
+
+      assert %{
+               "author" => %{
+                 "username" => "username",
+                 "bio" => "bio",
+                 "image" => "image",
+                 "following" => _following
+               },
+               "body" => _,
+               "description" => _,
+               "favoritesCount" => _,
+               "slug" => _,
+               "tagList" => [_],
+               "title" => _
+             } = articles |> List.first()
     end
 
     test "filtering by tag", %{conn: conn} do
@@ -88,7 +121,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "update article" do
-    setup [:create_article, :login]
+    setup [:login, :create_article]
 
     test "renders article when data is valid", %{
       conn: conn,
@@ -119,7 +152,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   describe "delete article" do
-    setup [:create_article, :login]
+    setup [:login, :create_article]
 
     test "deletes chosen article", %{conn: conn, article: %Article{slug: id} = article} do
       conn = delete(conn, Routes.article_path(conn, :delete, id))
@@ -131,20 +164,20 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     end
   end
 
-  defp create_article(_) do
-    article = fixture(:article)
+  defp create_article(%{user: user}) do
+    article = fixture(:article, user.id)
     %{article: article}
   end
 
-  defp create_articles(_) do
+  defp create_articles(%{user: user}) do
     @tag_candinates
     |> Enum.each(fn tag ->
-      fixture(:article, [tag])
+      fixture(:article, user.id, [tag])
     end)
   end
 
   defp login(%{conn: conn}) do
-    conn = put_authorization(conn)
-    %{conn: conn}
+    user = fixture(:user)
+    %{conn: put_authorization(conn, user), user: user}
   end
 end
