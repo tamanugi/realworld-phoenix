@@ -64,7 +64,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     test "lists all articles", %{conn: conn} do
       conn = get(conn, Routes.article_path(conn, :index))
 
-      %{"articles" => articles, "articleCount" => articleCount} = json_response(conn, 200)
+      %{"articles" => articles, "articlesCount" => articleCount} = json_response(conn, 200)
       assert articles |> length() == length(@tag_candinates)
       assert articleCount == length(@tag_candinates)
 
@@ -72,16 +72,19 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
                "author" => %{
                  "username" => "username",
                  "bio" => "bio",
-                 "image" => "image",
-                 "following" => _following
+                 "image" => "image"
+                 #  "following" => _following
                },
                "body" => _,
                "description" => _,
-               "favoritesCount" => _,
                "slug" => _,
                "tagList" => [_],
-               "title" => _
-             } = articles |> List.first()
+               "title" => _,
+               "createdAt" => _,
+               "updatedAt" => _,
+               #  "favorited" => false,
+               "favoritesCount" => _
+             } = List.first(articles)
     end
 
     test "filtering by tag", %{conn: conn} do

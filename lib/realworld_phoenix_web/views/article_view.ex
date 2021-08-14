@@ -5,7 +5,10 @@ defmodule RealworldPhoenixWeb.ArticleView do
   alias RealworldPhoenix.Repo
 
   def render("index.json", %{articles: articles}) do
-    %{articles: render_many(articles, ArticleView, "article.json")}
+    %{
+      articles: render_many(articles, ArticleView, "article.json"),
+      articlesCount: length(articles)
+    }
   end
 
   def render("show.json", %{article: article}) do
@@ -23,6 +26,14 @@ defmodule RealworldPhoenixWeb.ArticleView do
       body: article.body,
       tagList: article.tagList,
       favoritesCount: article.favoritesCount,
+      createdAt:
+        article.inserted_at
+        |> DateTime.truncate(:millisecond)
+        |> DateTime.to_iso8601(:extended, 0),
+      updatedAt:
+        article.updated_at
+        |> DateTime.truncate(:millisecond)
+        |> DateTime.to_iso8601(:extended, 0),
       author: render_one(article.author, ArticleView, "author.json")
     }
   end

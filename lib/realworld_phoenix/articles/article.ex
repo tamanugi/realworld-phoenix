@@ -13,7 +13,7 @@ defmodule RealworldPhoenix.Articles.Article do
     field :title, :string
     belongs_to :author, User
 
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc false
@@ -21,6 +21,6 @@ defmodule RealworldPhoenix.Articles.Article do
     article
     |> cast(attrs, [:slug, :title, :description, :body, :tagList, :favoritesCount, :author_id])
     |> cast_assoc(:author)
-    |> validate_required([:slug, :title, :description, :body, :tagList, :favoritesCount])
+    |> validate_required([:slug, :title, :description, :body, :tagList])
   end
 end
