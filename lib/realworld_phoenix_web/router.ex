@@ -38,6 +38,8 @@ defmodule RealworldPhoenixWeb.Router do
     get "/articles/:slug", ArticleController, :show
     post "/users/login", UserController, :login
     post "/users", UserController, :create
+
+    get "/profiles/:username", ProfileController, :show
   end
 
   # required Authenticated
