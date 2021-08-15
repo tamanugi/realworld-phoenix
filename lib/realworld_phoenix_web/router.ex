@@ -40,6 +40,8 @@ defmodule RealworldPhoenixWeb.Router do
 
     get "/articles", ArticleController, :index
     get "/articles/:slug", ArticleController, :show
+    get "/articles/:slug/comments", CommentController, :list
+
     post "/users/login", UserController, :login
     post "/users", UserController, :create
 
@@ -52,9 +54,13 @@ defmodule RealworldPhoenixWeb.Router do
 
     get "/user", UserController, :show
     put "/user", UserController, :update
+
     post "/articles", ArticleController, :create
     put "/articles/:slug", ArticleController, :update
     delete "/articles/:slug", ArticleController, :delete
+
+    post "/articles/:slug/comments", CommentController, :create
+    delete "/articles/:slug/comments/:id", CommentController, :delete
 
     post "/profiles/:username/follow", ProfileController, :follow
     delete "/profiles/:username/follow", ProfileController, :unfollow

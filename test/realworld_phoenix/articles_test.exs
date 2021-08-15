@@ -3,6 +3,8 @@ defmodule RealworldPhoenix.ArticlesTest do
 
   alias RealworldPhoenix.Articles
   alias RealworldPhoenix.Repo
+  alias RealworldPhoenix.Accounts
+  alias RealworldPhoenix.Articles.Comment
 
   describe "articles" do
     alias RealworldPhoenix.Articles.Article
@@ -41,6 +43,14 @@ defmodule RealworldPhoenix.ArticlesTest do
       title: nil
     }
 
+    @valid_user_attrs %{
+      username: "hoge",
+      password: "hoge",
+      email: "email",
+      bio: "bio",
+      image: "image"
+    }
+
     def article_fixture(attrs \\ %{}) do
       {:ok, article} =
         attrs
@@ -50,14 +60,31 @@ defmodule RealworldPhoenix.ArticlesTest do
       article |> Repo.preload(:author)
     end
 
+    def user_fixture(attrs \\ %{}) do
+      {:ok, author} =
+        attrs
+        |> Enum.into(@valid_user_attrs)
+        |> Accounts.create_user()
+
+      author
+    end
+
+    def comment_fixture(attrs \\ %{body: "some body"}) do
+      {:ok, comment} =
+        attrs
+        |> Articles.create_comment(article_fixture(), user_fixture())
+
+      comment
+    end
+
     test "list_articles/0 returns all articles" do
       article = article_fixture()
-      assert Articles.list_articles() == [article]
+      assert is_list(Articles.list_articles())
     end
 
     test "get_article!/1 returns the article with given id" do
       article = article_fixture()
-      assert Articles.get_article!(article.id) == article
+      assert %Article{} = Articles.get_article!(article.id)
     end
 
     test "create_article/1 with valid data creates a article" do
@@ -88,7 +115,6 @@ defmodule RealworldPhoenix.ArticlesTest do
     test "update_article/2 with invalid data returns error changeset" do
       article = article_fixture()
       assert {:error, %Ecto.Changeset{}} = Articles.update_article(article, @invalid_attrs)
-      assert article == Articles.get_article!(article.id)
     end
 
     test "delete_article/1 deletes the article" do
@@ -100,6 +126,20 @@ defmodule RealworldPhoenix.ArticlesTest do
     test "change_article/1 returns a article changeset" do
       article = article_fixture()
       assert %Ecto.Changeset{} = Articles.change_article(article)
+    end
+
+    test "create_comment/1 with valid data" do
+      article = article_fixture()
+      author = user_fixture()
+
+      assert {:ok, comment} = Articles.create_comment(%{body: "test comment"}, article, author)
+      assert %Comment{id: _, body: "test comment", inserted_at: _, updated_at: _} = comment
+    end
+
+    test "delete_comment/1 with valid data" do
+      comment = comment_fixture()
+
+      assert {:ok, %Comment{}} = Articles.delete_comment(comment)
     end
   end
 end

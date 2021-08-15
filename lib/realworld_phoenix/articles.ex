@@ -7,6 +7,8 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Repo
 
   alias RealworldPhoenix.Articles.Article
+  alias RealworldPhoenix.Articles.Comment
+  alias RealworldPhoenix.Accounts.User
 
   @doc """
   Returns the list of articles.
@@ -114,5 +116,28 @@ defmodule RealworldPhoenix.Articles do
   """
   def change_article(%Article{} = article, attrs \\ %{}) do
     Article.changeset(article, attrs)
+  end
+
+  def create_comment(attrs) do
+    Comment.changeset(%Comment{}, attrs)
+    |> Repo.insert()
+  end
+
+  def create_comment(comment, %Article{} = article, %User{} = author) do
+    attrs =
+      comment
+      |> Map.put(:article_id, article.id)
+      |> Map.put(:author_id, author.id)
+
+    Comment.changeset(%Comment{}, attrs)
+    |> Repo.insert()
+  end
+
+  def get_comment!(id) do
+    Repo.get!(Comment, id)
+  end
+
+  def delete_comment(%Comment{} = comment) do
+    Repo.delete(comment)
   end
 end

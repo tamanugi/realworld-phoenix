@@ -3,6 +3,7 @@ defmodule RealworldPhoenix.Articles.Article do
   import Ecto.Changeset
 
   alias RealworldPhoenix.Accounts.User
+  alias RealworldPhoenix.Articles.Comment
 
   schema "articles" do
     field :body, :string
@@ -12,6 +13,8 @@ defmodule RealworldPhoenix.Articles.Article do
     field :tagList, {:array, :string}
     field :title, :string
     belongs_to :author, User
+
+    has_many :comments, Comment
 
     timestamps(type: :utc_datetime_usec)
   end
