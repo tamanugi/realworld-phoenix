@@ -28,7 +28,11 @@ defmodule RealworldPhoenixWeb.CommentView do
       username: author.username,
       bio: author.bio,
       image: author.image,
-      following: false
+      following:
+        case author.following do
+          nil -> false
+          following -> following
+        end
     }
   end
 end

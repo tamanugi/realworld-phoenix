@@ -2,6 +2,7 @@ defmodule RealworldPhoenixWeb.CommentControllerTest do
   use RealworldPhoenixWeb.ConnCase
 
   alias RealworldPhoenix.Articles
+  alias RealworldPhoenix.Profiles
   alias RealworldPhoenix.Accounts
 
   @valid_attrs %{
@@ -59,7 +60,7 @@ defmodule RealworldPhoenixWeb.CommentControllerTest do
   end
 
   describe "index" do
-    setup [:login, :create_article, :create_comment]
+    setup [:login, :create_article, :create_comment_other_user]
 
     test "multiple comments by article", %{conn: conn, article: article} do
       conn = get(conn, Routes.comment_path(conn, :list, article.slug))
@@ -68,7 +69,7 @@ defmodule RealworldPhoenixWeb.CommentControllerTest do
                %{
                  "author" => %{
                    "bio" => "bio",
-                   "following" => false,
+                   "following" => true,
                    "image" => "image",
                    "username" => "username"
                  },
@@ -126,6 +127,15 @@ defmodule RealworldPhoenixWeb.CommentControllerTest do
 
   defp create_comment(%{article: article, user: user}) do
     comment = fixture(:comment, %{article_id: article.id, author_id: user.id})
+
+    %{comment: comment}
+  end
+
+  defp create_comment_other_user(%{article: article, user: user}) do
+    comment_user = fixture(:user)
+    comment = fixture(:comment, %{article_id: article.id, author_id: comment_user.id})
+    Profiles.create_follow(user, comment_user)
+
     %{comment: comment}
   end
 end

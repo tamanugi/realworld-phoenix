@@ -10,6 +10,8 @@ defmodule RealworldPhoenix.Accounts.User do
     field :username, :string
     field :password, :string
 
+    field :following, :boolean, virtual: true
+
     timestamps()
   end
 

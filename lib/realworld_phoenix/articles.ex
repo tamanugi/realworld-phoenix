@@ -10,6 +10,8 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Articles.Comment
   alias RealworldPhoenix.Accounts.User
 
+  # require Kernel
+
   @doc """
   Returns the list of articles.
 
@@ -131,6 +133,20 @@ defmodule RealworldPhoenix.Articles do
 
     Comment.changeset(%Comment{}, attrs)
     |> Repo.insert()
+  end
+
+  def list_comment_by_article_slug(slug, user_id) do
+    q =
+      from c in Comment,
+        join: at in assoc(c, :author),
+        join: a in Article,
+        on: c.article_id == a.id,
+        left_join: fr in RealworldPhoenix.Profiles.FollowRelated,
+        on: fr.target_id == c.author_id and fr.user_id == ^user_id,
+        where: a.slug == ^slug,
+        select_merge: %{author: merge(at, %{following: not is_nil(fr)})}
+
+    Repo.all(q)
   end
 
   def get_comment!(id) do

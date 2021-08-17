@@ -8,12 +8,9 @@ defmodule RealworldPhoenixWeb.CommentController do
   action_fallback RealworldPhoenixWeb.FallbackController
 
   def list(conn, %{"slug" => slug}) do
-    article =
-      Articles.get_article_by_slug!(slug)
-      |> Repo.preload(:comments)
+    user = Guardian.Plug.current_resource(conn)
 
-    comments = article.comments |> Repo.preload(:author)
-
+    comments = Articles.list_comment_by_article_slug(slug, user.id)
     render(conn, "list.json", comments: comments)
   end
 
@@ -29,8 +26,7 @@ defmodule RealworldPhoenixWeb.CommentController do
     %{id: user_id} = Guardian.Plug.current_resource(conn)
 
     with %Comment{} = comment <- Articles.get_comment!(comment_id),
-         comment <- comment |> Repo.preload(:author),
-         ^user_id <- comment.author.id,
+         ^user_id <- comment.author_id,
          {:ok, _} <- Articles.delete_comment(comment) do
       send_resp(conn, 200, "")
     end
