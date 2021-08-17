@@ -21,4 +21,11 @@ defmodule RealworldPhoenixWeb.FallbackController do
     |> put_view(RealworldPhoenixWeb.ErrorView)
     |> render(:"404")
   end
+
+  def call(conn, _) do
+    conn
+    |> put_status(500)
+    |> put_view(RealworldPhoenixWeb.ErrorView)
+    |> render(:"404")
+  end
 end

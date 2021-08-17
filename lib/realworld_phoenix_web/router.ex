@@ -64,6 +64,9 @@ defmodule RealworldPhoenixWeb.Router do
 
     post "/profiles/:username/follow", ProfileController, :follow
     delete "/profiles/:username/follow", ProfileController, :unfollow
+
+    post "/articles/:slug/favorite", FavoriteController, :create
+    delete "/articles/:slug/favorite", FavoriteController, :delete
   end
 
   # Enables LiveDashboard only for development

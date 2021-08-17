@@ -52,7 +52,7 @@ defmodule RealworldPhoenix.Articles do
   def get_article!(id), do: Repo.get!(Article, id) |> Repo.preload(:author)
 
   def get_article_by_slug!(slug) do
-    Repo.get_by!(Article, slug: slug)
+    Repo.get_by(Article, slug: slug)
   end
 
   @doc """
@@ -155,5 +155,23 @@ defmodule RealworldPhoenix.Articles do
 
   def delete_comment(%Comment{} = comment) do
     Repo.delete(comment)
+  end
+
+  alias RealworldPhoenix.Articles.Favorite
+
+  def create_favorite(%User{} = user, %Article{} = article) do
+    %Favorite{}
+    |> Favorite.changeset(%{user_id: user.id, article_id: article.id})
+    |> Repo.insert()
+  end
+
+  def delete_favorite(%User{} = user, %Article{} = article) do
+    from(f in Favorite,
+      where:
+        f.user_id == ^user.id and
+          f.article_id ==
+            ^article.id
+    )
+    |> Repo.delete_all()
   end
 end
