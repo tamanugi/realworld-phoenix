@@ -22,8 +22,19 @@ defmodule RealworldPhoenix.Articles.Article do
   @doc false
   def changeset(article, attrs) do
     article
-    |> cast(attrs, [:slug, :title, :description, :body, :tagList, :favoritesCount, :author_id])
+    |> cast(attrs, [:title, :description, :body, :tagList, :favoritesCount, :author_id])
     |> cast_assoc(:author)
-    |> validate_required([:slug, :title, :description, :body, :tagList])
+    |> validate_required([:title, :description, :body])
+  end
+
+  def title_to_slugify(changeset) do
+    case get_change(changeset, :title) do
+      nil -> changeset
+      title -> put_change(changeset, :slug, slugify(title))
+    end
+  end
+
+  defp slugify(title) do
+    title |> String.downcase() |> String.replace(~r/[^\w-]+/u, "-")
   end
 end
