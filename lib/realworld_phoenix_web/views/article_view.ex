@@ -16,9 +16,6 @@ defmodule RealworldPhoenixWeb.ArticleView do
   end
 
   def render("article.json", %{article: article}) do
-    # Anti Pattern?
-    article = Repo.preload(article, :author)
-
     %{
       slug: article.slug,
       title: article.title,

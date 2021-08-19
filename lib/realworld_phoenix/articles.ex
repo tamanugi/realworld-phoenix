@@ -9,6 +9,7 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Articles.Article
   alias RealworldPhoenix.Articles.Comment
   alias RealworldPhoenix.Accounts.User
+  alias RealworldPhoenix.Articles.Favorite
 
   # require Kernel
 
@@ -21,19 +22,34 @@ defmodule RealworldPhoenix.Articles do
       [%Article{}, ...]
 
   """
-  def list_articles() do
-    Article
-    |> preload(:author)
+  def list_articles(params \\ []) do
+    from(a in Article)
+    |> article_where(params)
     |> Repo.all()
   end
 
-  def list_articles(%{"tag" => tag}) do
-    from(a in Article, where: ^tag in a.tagList)
-    |> preload(:author)
-    |> Repo.all()
+  def article_where(query, []), do: query
+
+  def article_where(query, [{:tag, tag} | rest]) do
+    query
+    |> where([a], ^tag in a.tagList)
+    |> article_where(rest)
   end
 
-  def list_articles(%{}), do: list_articles()
+  def article_where(query, [{:author, author_name} | rest]) do
+    query
+    |> join(:inner, [a], author in User, as: :author, on: a.author_id == author.id)
+    |> where([author: author], author.username == ^author_name)
+    |> article_where(rest)
+  end
+
+  def article_where(query, [{:favorited, favorited} | rest]) do
+    query
+    |> join(:left, [a], f in Favorite, as: :favorite, on: a.id == f.article_id)
+    |> join(:left, [favorite: f], fu in User, as: :favorite_user, on: f.user_id == fu.id)
+    |> where([favorite_user: fu], fu.username == ^favorited)
+    |> article_where(rest)
+  end
 
   @doc """
   Gets a single article.

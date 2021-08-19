@@ -69,6 +69,10 @@ defmodule RealworldPhoenix.ArticlesTest do
       author
     end
 
+    def favorite_fixture(user, article) do
+      Articles.create_favorite(user, article)
+    end
+
     def comment_fixture(attrs \\ %{body: "some body"}) do
       {:ok, comment} =
         attrs
