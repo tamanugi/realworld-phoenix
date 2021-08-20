@@ -51,6 +51,18 @@ defmodule RealworldPhoenix.Articles do
     |> article_where(rest)
   end
 
+  def article_where(query, [{:limit, limit} | rest]) do
+    query
+    |> limit(^limit)
+    |> article_where(rest)
+  end
+
+  def article_where(query, [{:offset, offset} | rest]) do
+    query
+    |> offset(^offset)
+    |> article_where(rest)
+  end
+
   @doc """
   Gets a single article.
 
