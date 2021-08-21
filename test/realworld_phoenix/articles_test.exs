@@ -101,6 +101,16 @@ defmodule RealworldPhoenix.ArticlesTest do
       assert %Article{} = Articles.get_article!(article.id)
     end
 
+    test "get_article_by_slug!/1 returns the article with slug" do
+      article = article_fixture()
+      assert %Article{} = Articles.get_article_by_slug!(article.slug)
+
+      user = user_fixture()
+      favorite_fixture(user, article)
+
+      assert %Article{favorited: true} = Articles.get_article_by_slug!(article.slug, user)
+    end
+
     test "create_article/1 with valid data creates a article" do
       assert {:ok, %Article{} = article} = Articles.create_article(@valid_attrs)
       assert article.body == "some body"

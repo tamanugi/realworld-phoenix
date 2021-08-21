@@ -65,13 +65,19 @@ defmodule RealworldPhoenix.Articles do
   end
 
   def article_where(query, [{:user, %User{} = user} | rest]) do
+    artcile_favorite(query, user)
+    |> article_where(rest)
+  end
+
+  def artcile_favorite(query, nil), do: query
+
+  def artcile_favorite(query, user) do
     query
     |> join(:left, [a], f in Favorite,
       as: :myfavorite,
       on: a.id == f.article_id and f.user_id == ^user.id
     )
     |> select_merge([myfavorite: f], %{favorited: not is_nil(f)})
-    |> article_where(rest)
   end
 
   @doc """
@@ -90,8 +96,10 @@ defmodule RealworldPhoenix.Articles do
   """
   def get_article!(id), do: Repo.get!(Article, id) |> Repo.preload(:author)
 
-  def get_article_by_slug!(slug) do
-    Repo.get_by(Article, slug: slug)
+  def get_article_by_slug!(slug, user \\ nil) do
+    from(a in Article, where: a.slug == ^slug)
+    |> artcile_favorite(user)
+    |> Repo.one!()
   end
 
   @doc """
