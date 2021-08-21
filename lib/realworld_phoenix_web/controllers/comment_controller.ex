@@ -10,7 +10,7 @@ defmodule RealworldPhoenixWeb.CommentController do
   def list(conn, %{"slug" => slug}) do
     user = Guardian.Plug.current_resource(conn)
 
-    comments = Articles.list_comment_by_article_slug(slug, user.id)
+    comments = Articles.list_comment_by_article_slug(slug, user) |> Repo.preload(:author)
     render(conn, "list.json", comments: comments)
   end
 

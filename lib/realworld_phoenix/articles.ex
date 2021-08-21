@@ -11,6 +11,8 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Articles.Favorite
 
+  alias RealworldPhoenix.Profiles.FollowRelated
+
   # require Kernel
 
   @doc """
@@ -186,18 +188,16 @@ defmodule RealworldPhoenix.Articles do
     |> Repo.insert()
   end
 
-  def list_comment_by_article_slug(slug, user_id) do
-    q =
-      from c in Comment,
-        join: at in assoc(c, :author),
-        join: a in Article,
-        on: c.article_id == a.id,
-        left_join: fr in RealworldPhoenix.Profiles.FollowRelated,
-        on: fr.target_id == c.author_id and fr.user_id == ^user_id,
-        where: a.slug == ^slug,
-        select_merge: %{author: merge(at, %{following: not is_nil(fr)})}
-
-    Repo.all(q)
+  def list_comment_by_article_slug(slug, user) do
+    from(c in Comment,
+      join: a in Article,
+      on: c.article_id == a.id,
+      where:
+        a.slug ==
+          ^slug
+    )
+    |> comment_following(user)
+    |> Repo.all()
   end
 
   def get_comment!(id) do
@@ -207,6 +207,20 @@ defmodule RealworldPhoenix.Articles do
   def delete_comment(%Comment{} = comment) do
     Repo.delete(comment)
   end
+
+  def comment_following(query, %User{id: user_id}) do
+    query
+    |> join(:inner, [c], at in assoc(c, :author), as: :author)
+    |> join(:left, [c], fr in FollowRelated,
+      as: :fr,
+      on: fr.target_id == c.author_id and fr.user_id == ^user_id
+    )
+    |> select_merge([fr: fr, author: author], %{
+      author: merge(author, %{following: not is_nil(fr)})
+    })
+  end
+
+  def comment_following(query, _), do: query
 
   alias RealworldPhoenix.Articles.Favorite
 

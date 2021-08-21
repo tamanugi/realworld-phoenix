@@ -40,8 +40,8 @@ defmodule RealworldPhoenixWeb.ArticleView do
     %{
       username: author.username,
       bio: author.bio,
-      image: author.image
-      # "following": false
+      image: author.image,
+      following: author.following
     }
   end
 end

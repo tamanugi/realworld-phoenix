@@ -10,9 +10,7 @@ defmodule RealworldPhoenix.Articles.Comment do
     belongs_to :author, User
     belongs_to :article, Article
 
-    # field :following, :boolean, virtual: true
-
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc false

@@ -16,8 +16,14 @@ defmodule RealworldPhoenixWeb.CommentView do
   def render("comment.json", %{comment: %Comment{} = comment}) do
     %{
       id: comment.id,
-      createdAt: comment.inserted_at,
-      updatedAt: comment.updated_at,
+      createdAt:
+        comment.inserted_at
+        |> DateTime.truncate(:millisecond)
+        |> DateTime.to_iso8601(:extended, 0),
+      updatedAt:
+        comment.updated_at
+        |> DateTime.truncate(:millisecond)
+        |> DateTime.to_iso8601(:extended, 0),
       body: comment.body,
       author: render_one(comment.author, CommentView, "author.json", as: :author)
     }
