@@ -27,6 +27,7 @@ defmodule RealworldPhoenix.Articles.Article do
     |> cast(attrs, [:title, :description, :body, :tagList, :favoritesCount, :author_id])
     |> cast_assoc(:author)
     |> validate_required([:title, :description, :body])
+    |> title_to_slugify()
   end
 
   def title_to_slugify(changeset) do
