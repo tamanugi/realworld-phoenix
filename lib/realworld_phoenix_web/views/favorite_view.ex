@@ -1,16 +1,9 @@
 defmodule RealworldPhoenixWeb.FavoriteView do
   use RealworldPhoenixWeb, :view
-  alias RealworldPhoenixWeb.FavoriteView
 
-  def render("index.json", %{favorites: favorites}) do
-    %{data: render_many(favorites, FavoriteView, "favorite.json")}
-  end
+  alias RealworldPhoenixWeb.ArticleView
 
-  def render("show.json", %{favorite: favorite}) do
-    %{data: render_one(favorite, FavoriteView, "favorite.json")}
-  end
-
-  def render("favorite.json", %{favorite: favorite}) do
-    %{id: favorite.id}
+  def render("show.json", params) do
+    ArticleView.render("show.json", params)
   end
 end
