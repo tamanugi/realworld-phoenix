@@ -31,6 +31,18 @@ defmodule RealworldPhoenix.Articles do
     |> Repo.all()
   end
 
+  def list_articles_feed(user, limit \\ 20, offset \\ 0) do
+    from(a in Article,
+      inner_join: f in Favorite,
+      on: a.id == f.article_id,
+      where: f.user_id == ^user.id,
+      limit: ^limit,
+      offset: ^offset
+    )
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
+  end
+
   def article_where(query, []), do: query
 
   def article_where(query, [{:tag, tag} | rest]) do

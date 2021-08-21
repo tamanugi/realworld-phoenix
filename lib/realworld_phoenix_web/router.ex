@@ -34,6 +34,29 @@ defmodule RealworldPhoenixWeb.Router do
     get "/", PageController, :index
   end
 
+  # required Authenticated
+  scope "/api", RealworldPhoenixWeb do
+    pipe_through [:api, :require_authenticated]
+
+    get "/user", UserController, :show
+    put "/user", UserController, :update
+
+    post "/articles", ArticleController, :create
+    get "/articles/feed", ArticleController, :feed
+
+    put "/articles/:slug", ArticleController, :update
+    delete "/articles/:slug", ArticleController, :delete
+
+    post "/articles/:slug/comments", CommentController, :create
+    delete "/articles/:slug/comments/:id", CommentController, :delete
+
+    post "/profiles/:username/follow", ProfileController, :follow
+    delete "/profiles/:username/follow", ProfileController, :unfollow
+
+    post "/articles/:slug/favorite", FavoriteController, :create
+    delete "/articles/:slug/favorite", FavoriteController, :delete
+  end
+
   # Not required Authenticated
   scope "/api", RealworldPhoenixWeb do
     pipe_through [:api, :check_authenticated]
@@ -46,27 +69,6 @@ defmodule RealworldPhoenixWeb.Router do
     post "/users", UserController, :create
 
     get "/profiles/:username", ProfileController, :show
-  end
-
-  # required Authenticated
-  scope "/api", RealworldPhoenixWeb do
-    pipe_through [:api, :require_authenticated]
-
-    get "/user", UserController, :show
-    put "/user", UserController, :update
-
-    post "/articles", ArticleController, :create
-    put "/articles/:slug", ArticleController, :update
-    delete "/articles/:slug", ArticleController, :delete
-
-    post "/articles/:slug/comments", CommentController, :create
-    delete "/articles/:slug/comments/:id", CommentController, :delete
-
-    post "/profiles/:username/follow", ProfileController, :follow
-    delete "/profiles/:username/follow", ProfileController, :unfollow
-
-    post "/articles/:slug/favorite", FavoriteController, :create
-    delete "/articles/:slug/favorite", FavoriteController, :delete
   end
 
   # Enables LiveDashboard only for development

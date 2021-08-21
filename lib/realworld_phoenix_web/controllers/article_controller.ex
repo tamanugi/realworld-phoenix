@@ -77,4 +77,18 @@ defmodule RealworldPhoenixWeb.ArticleController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def feed(conn, params) do
+    limit = Map.get(params, "limit", @default_limit)
+    offset = Map.get(params, "offset", @default_offset)
+
+    user = Guardian.Plug.current_resource(conn)
+
+    articles =
+      Articles.list_articles_feed(user, limit, offset)
+      |> Repo.preload(:author)
+      |> Repo.preload(:favorites)
+
+    render(conn, "index.json", articles: articles)
+  end
 end
