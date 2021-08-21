@@ -14,6 +14,8 @@ defmodule RealworldPhoenix.Articles.Article do
     field :title, :string
     belongs_to :author, User
 
+    field :favorited, :boolean, virtual: true
+
     has_many :comments, Comment
 
     timestamps(type: :utc_datetime_usec)

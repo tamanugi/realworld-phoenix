@@ -86,6 +86,16 @@ defmodule RealworldPhoenix.ArticlesTest do
       assert is_list(Articles.list_articles())
     end
 
+    test "list_articles/0 favorited" do
+      article1 = article_fixture()
+      article2 = article_fixture()
+
+      user = user_fixture()
+      favorite_fixture(user, article1)
+
+      assert [%{favorited: false}, %{favorited: true}] = Articles.list_articles(user: user)
+    end
+
     test "get_article!/1 returns the article with given id" do
       article = article_fixture()
       assert %Article{} = Articles.get_article!(article.id)

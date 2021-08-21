@@ -63,6 +63,16 @@ defmodule RealworldPhoenix.Articles do
     |> article_where(rest)
   end
 
+  def article_where(query, [{:user, %User{} = user} | rest]) do
+    query
+    |> join(:left, [a], f in Favorite,
+      as: :myfavorite,
+      on: a.id == f.article_id and f.user_id == ^user.id
+    )
+    |> select_merge([myfavorite: f], %{favorited: not is_nil(f)})
+    |> article_where(rest)
+  end
+
   @doc """
   Gets a single article.
 
