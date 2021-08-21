@@ -22,9 +22,11 @@ defmodule RealworldPhoenix.Articles do
       [%Article{}, ...]
 
   """
-  def list_articles(params \\ []) do
+  def list_articles(params \\ [], limit \\ 20, offset \\ 0) do
     from(a in Article)
     |> article_where(params)
+    |> limit(^limit)
+    |> offset(^offset)
     |> order_by(desc: :inserted_at)
     |> Repo.all()
   end
@@ -52,22 +54,12 @@ defmodule RealworldPhoenix.Articles do
     |> article_where(rest)
   end
 
-  def article_where(query, [{:limit, limit} | rest]) do
-    query
-    |> limit(^limit)
-    |> article_where(rest)
-  end
-
-  def article_where(query, [{:offset, offset} | rest]) do
-    query
-    |> offset(^offset)
-    |> article_where(rest)
-  end
-
   def article_where(query, [{:user, %User{} = user} | rest]) do
     artcile_favorite(query, user)
     |> article_where(rest)
   end
+
+  def article_where(query, _), do: query
 
   def artcile_favorite(query, nil), do: query
 

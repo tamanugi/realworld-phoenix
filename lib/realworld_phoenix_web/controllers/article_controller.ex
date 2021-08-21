@@ -7,6 +7,9 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
   action_fallback RealworldPhoenixWeb.FallbackController
 
+  @default_limit 20
+  @default_offset 0
+
   def index(conn, params) do
     keywords = for {key, val} <- params, do: {String.to_atom(key), val}
 
@@ -16,8 +19,11 @@ defmodule RealworldPhoenixWeb.ArticleController do
         user -> keywords |> Keyword.put(:user, user)
       end
 
+    limit = keywords |> Keyword.get(:limit, @default_limit)
+    offset = keywords |> Keyword.get(:offset, @default_offset)
+
     articles =
-      Articles.list_articles(keywords)
+      Articles.list_articles(keywords, limit, offset)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
 
