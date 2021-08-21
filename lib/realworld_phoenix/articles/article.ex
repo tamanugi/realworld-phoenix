@@ -4,6 +4,7 @@ defmodule RealworldPhoenix.Articles.Article do
 
   alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Articles.Comment
+  alias RealworldPhoenix.Articles.Favorite
 
   schema "articles" do
     field :body, :string
@@ -17,6 +18,7 @@ defmodule RealworldPhoenix.Articles.Article do
     field :favorited, :boolean, virtual: true
 
     has_many :comments, Comment
+    has_many :favorites, Favorite
 
     timestamps(type: :utc_datetime_usec)
   end

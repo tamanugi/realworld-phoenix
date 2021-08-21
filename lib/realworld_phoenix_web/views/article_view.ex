@@ -22,7 +22,8 @@ defmodule RealworldPhoenixWeb.ArticleView do
       description: article.description,
       body: article.body,
       tagList: article.tagList,
-      favoritesCount: article.favoritesCount,
+      favoritesCount: article.favorites |> Enum.count(),
+      favorited: article.favorited,
       createdAt:
         article.inserted_at
         |> DateTime.truncate(:millisecond)

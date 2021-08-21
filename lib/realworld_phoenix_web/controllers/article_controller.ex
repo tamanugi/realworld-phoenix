@@ -9,7 +9,18 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
   def index(conn, params) do
     keywords = for {key, val} <- params, do: {String.to_atom(key), val}
-    articles = Articles.list_articles(keywords) |> Repo.preload(:author)
+
+    keywords =
+      case Guardian.Plug.current_resource(conn) do
+        nil -> keywords
+        user -> keywords |> Keyword.put(:user, user)
+      end
+
+    articles =
+      Articles.list_articles(keywords)
+      |> Repo.preload(:author)
+      |> Repo.preload(:favorites)
+
     render(conn, "index.json", articles: articles)
   end
 
@@ -17,7 +28,10 @@ defmodule RealworldPhoenixWeb.ArticleController do
     with user <- Guardian.Plug.current_resource(conn),
          article_params <- Map.put(article_params, "author_id", user.id),
          {:ok, %Article{} = article} <- Articles.create_article(article_params) do
-      article = article |> Repo.preload(:author)
+      article =
+        article
+        |> Repo.preload(:author)
+        |> Repo.preload(:favorites)
 
       conn
       |> put_status(:created)
@@ -27,7 +41,13 @@ defmodule RealworldPhoenixWeb.ArticleController do
   end
 
   def show(conn, %{"slug" => slug}) do
-    article = Articles.get_article_by_slug!(slug) |> Repo.preload(:author)
+    user = Guardian.Plug.current_resource(conn)
+
+    article =
+      Articles.get_article_by_slug!(slug, user)
+      |> Repo.preload(:author)
+      |> Repo.preload(:favorites)
+
     render(conn, "show.json", article: article)
   end
 
@@ -35,7 +55,11 @@ defmodule RealworldPhoenixWeb.ArticleController do
     article = Articles.get_article_by_slug!(slug)
 
     with {:ok, %Article{} = article} <- Articles.update_article(article, article_params) do
-      article = article |> Repo.preload(:author)
+      article =
+        article
+        |> Repo.preload(:author)
+        |> Repo.preload(:favorites)
+
       render(conn, "show.json", article: article)
     end
   end
