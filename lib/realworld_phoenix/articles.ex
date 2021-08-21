@@ -25,6 +25,7 @@ defmodule RealworldPhoenix.Articles do
   def list_articles(params \\ []) do
     from(a in Article)
     |> article_where(params)
+    |> order_by(desc: :inserted_at)
     |> Repo.all()
   end
 
