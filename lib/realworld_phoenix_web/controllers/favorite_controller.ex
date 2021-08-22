@@ -9,11 +9,11 @@ defmodule RealworldPhoenixWeb.FavoriteController do
 
   def create(conn, %{"slug" => slug}) do
     with user <- Guardian.Plug.current_resource(conn),
-         %Article{} = article <- Articles.get_article_by_slug!(slug),
+         %Article{} = article <- Articles.get_article_by_slug(slug),
          {:ok, %Favorite{}} <- Articles.create_favorite(user, article) do
       # refech article data
       article =
-        Articles.get_article_by_slug!(slug, user)
+        Articles.get_article_by_slug(slug, user)
         |> Articles.article_preload()
 
       conn
@@ -25,9 +25,9 @@ defmodule RealworldPhoenixWeb.FavoriteController do
   def delete(conn, %{"slug" => slug}) do
     with user <- Guardian.Plug.current_resource(conn),
          %Article{} = article <-
-           Articles.get_article_by_slug!(slug, user)
+           Articles.get_article_by_slug(slug, user)
            |> Articles.article_preload(),
-         {1, _} <- Articles.delete_favorite(user, article) |> IO.inspect() do
+         {1, _} <- Articles.delete_favorite(user, article) do
       conn
       |> render("show.json",
         article:

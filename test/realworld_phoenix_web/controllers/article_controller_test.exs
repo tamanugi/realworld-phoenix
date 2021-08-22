@@ -174,9 +174,8 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
       conn = delete(conn, Routes.article_path(conn, :delete, id))
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
-        get(conn, Routes.article_path(conn, :show, id))
-      end
+      conn = get(conn, Routes.article_path(conn, :show, id))
+      assert response(conn, 404)
     end
   end
 

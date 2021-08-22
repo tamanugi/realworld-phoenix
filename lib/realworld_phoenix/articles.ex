@@ -112,10 +112,17 @@ defmodule RealworldPhoenix.Articles do
   """
   def get_article!(id), do: Repo.get!(Article, id) |> Repo.preload(:author)
 
-  def get_article_by_slug!(slug, user \\ nil) do
+  def get_article_by_slug(slug, user \\ nil) do
+    article =
+      get_article_by_slug_query(slug, user)
+      |> Repo.one()
+
+    unless is_nil(article), do: article, else: {:error, :not_found}
+  end
+
+  defp get_article_by_slug_query(slug, user) do
     from(a in Article, where: a.slug == ^slug)
     |> artcile_favorite(user)
-    |> Repo.one!()
   end
 
   @doc """

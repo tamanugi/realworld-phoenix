@@ -4,12 +4,7 @@ defmodule RealworldPhoenixWeb.FavoriteControllerTest do
   alias RealworldPhoenix.Accounts
   alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Articles
-  alias RealworldPhoenix.Articles.Favorite
   alias RealworldPhoenix.Articles.Article
-
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
 
   @article_attrs %{
     body: "some body",
@@ -62,12 +57,13 @@ defmodule RealworldPhoenixWeb.FavoriteControllerTest do
 
     test "renders favorite when data is valid", %{conn: conn, article: article} do
       conn = post(conn, Routes.favorite_path(conn, :create, article.slug))
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      expected_slug = article.slug
+      assert %{"slug" => ^expected_slug} = json_response(conn, 201)["article"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.favorite_path(conn, :create, "hogehoge"))
-      assert response(conn, 500)
+      assert response(conn, 404)
     end
   end
 
@@ -76,7 +72,7 @@ defmodule RealworldPhoenixWeb.FavoriteControllerTest do
 
     test "deletes chosen favorite", %{conn: conn, article: article} do
       conn = delete(conn, Routes.favorite_path(conn, :delete, article.slug))
-      assert response(conn, 204)
+      assert response(conn, 200)
     end
   end
 

@@ -2,6 +2,7 @@ defmodule RealworldPhoenixWeb.CommentController do
   use RealworldPhoenixWeb, :controller
 
   alias RealworldPhoenix.Articles
+  alias RealworldPhoenix.Articles.Article
   alias RealworldPhoenix.Articles.Comment
   alias RealworldPhoenix.Repo
 
@@ -16,7 +17,7 @@ defmodule RealworldPhoenixWeb.CommentController do
 
   def create(conn, %{"slug" => slug, "comment" => %{"body" => body}}) do
     with user <- Guardian.Plug.current_resource(conn),
-         article = Articles.get_article_by_slug!(slug),
+         %Article{} = article <- Articles.get_article_by_slug(slug),
          {:ok, comment} = Articles.create_comment(%{body: body}, article, user) do
       render(conn, "show.json", comment: comment |> Repo.preload(:author))
     end
