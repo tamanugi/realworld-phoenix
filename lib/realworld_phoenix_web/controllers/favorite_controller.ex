@@ -17,6 +17,7 @@ defmodule RealworldPhoenixWeb.FavoriteController do
         Articles.get_article_by_slug(slug, user)
         |> Repo.preload(:author)
         |> Repo.preload(:favorites)
+        |> Repo.preload(:tagList)
 
       conn
       |> put_status(:created)
@@ -29,7 +30,8 @@ defmodule RealworldPhoenixWeb.FavoriteController do
          %Article{} = article <-
            Articles.get_article_by_slug(slug, user)
            |> Repo.preload(:author)
-           |> Repo.preload(:favorites),
+           |> Repo.preload(:favorites)
+           |> Repo.preload(:tagList),
          {1, _} <- Articles.delete_favorite(user, article) |> IO.inspect() do
       conn
       |> render("show.json",

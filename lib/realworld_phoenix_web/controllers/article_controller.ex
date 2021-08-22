@@ -26,6 +26,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
       Articles.list_articles(keywords, limit, offset)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
+      |> Repo.preload(:tagList)
 
     render(conn, "index.json", articles: articles)
   end
@@ -38,6 +39,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
         article
         |> Repo.preload(:author)
         |> Repo.preload(:favorites)
+        |> Repo.preload(:tagList)
 
       conn
       |> put_status(:created)
@@ -53,6 +55,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
       Articles.get_article_by_slug(slug, user)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
+      |> Repo.preload(:tagList)
 
     render(conn, "show.json", article: article)
   end
@@ -65,6 +68,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
         article
         |> Repo.preload(:author)
         |> Repo.preload(:favorites)
+        |> Repo.preload(:tagList)
 
       render(conn, "show.json", article: article)
     end
@@ -88,6 +92,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
       Articles.list_articles_feed(user, limit, offset)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
+      |> Repo.preload(:tagList)
 
     render(conn, "index.json", articles: articles)
   end

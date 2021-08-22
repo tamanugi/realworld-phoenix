@@ -2,7 +2,7 @@ defmodule RealworldPhoenixWeb.ArticleView do
   use RealworldPhoenixWeb, :view
   alias RealworldPhoenixWeb.ArticleView
 
-  alias RealworldPhoenix.Repo
+  alias RealworldPhoenixWeb.TagView
 
   def render("index.json", %{articles: articles}) do
     %{
@@ -21,7 +21,7 @@ defmodule RealworldPhoenixWeb.ArticleView do
       title: article.title,
       description: article.description,
       body: article.body,
-      tagList: article.tagList,
+      tagList: render_many(article.tagList, TagView, "tag.json"),
       favoritesCount: article.favorites |> Enum.count(),
       favorited: article.favorited,
       createdAt:

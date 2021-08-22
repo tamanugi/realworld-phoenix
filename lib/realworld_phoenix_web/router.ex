@@ -69,6 +69,8 @@ defmodule RealworldPhoenixWeb.Router do
     post "/users", UserController, :create
 
     get "/profiles/:username", ProfileController, :show
+
+    get "/tags", TagController, :index
   end
 
   # Enables LiveDashboard only for development

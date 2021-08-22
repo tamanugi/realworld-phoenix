@@ -10,6 +10,7 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Articles.Comment
   alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Articles.Favorite
+  alias RealworldPhoenix.Articles.Tag
 
   alias RealworldPhoenix.Profiles.FollowRelated
 
@@ -49,7 +50,8 @@ defmodule RealworldPhoenix.Articles do
 
   def article_where(query, [{:tag, tag} | rest]) do
     query
-    |> where([a], ^tag in a.tagList)
+    |> join(:left, [a], at in assoc(a, :tagList), as: :tags)
+    |> where([tags: tags], tags.name == ^tag)
     |> article_where(rest)
   end
 
@@ -140,6 +142,7 @@ defmodule RealworldPhoenix.Articles do
   """
   def update_article(%Article{} = article, attrs) do
     article
+    |> Repo.preload(:tagList)
     |> Article.changeset(attrs)
     |> Repo.update()
   end
@@ -238,5 +241,9 @@ defmodule RealworldPhoenix.Articles do
             ^article.id
     )
     |> Repo.delete_all()
+  end
+
+  def list_tags() do
+    Repo.all(Tag)
   end
 end
