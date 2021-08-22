@@ -31,22 +31,17 @@ defmodule RealworldPhoenix.AccountsTest do
       user
     end
 
-    test "list_users/0 returns all users" do
-      user = user_fixture()
-      assert Accounts.list_users() == [user]
-    end
-
-    test "get_user!/1 returns the user with given id" do
-      user = user_fixture()
-      assert Accounts.get_user!(user.id) == user
-    end
-
     test "create_user/1 with valid data creates a user" do
       assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
       assert user.bio == "some bio"
       assert user.email == "some email"
       assert user.image == "some image"
       assert user.username == "some username"
+    end
+
+    test "get_user_by_email/1 returns a user" do
+      user = user_fixture()
+      assert user == Accounts.get_user_by_email(user.email)
     end
 
     test "create_user/1 with invalid data returns error changeset" do
@@ -66,12 +61,6 @@ defmodule RealworldPhoenix.AccountsTest do
       user = user_fixture()
       assert {:error, %Ecto.Changeset{}} = Accounts.update_user(user, @invalid_attrs)
       assert user == Accounts.get_user!(user.id)
-    end
-
-    test "delete_user/1 deletes the user" do
-      user = user_fixture()
-      assert {:ok, %User{}} = Accounts.delete_user(user)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
     end
 
     test "change_user/1 returns a user changeset" do

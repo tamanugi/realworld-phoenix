@@ -24,20 +24,11 @@ defmodule RealworldPhoenixWeb.UserController do
   end
 
   def update(conn, %{"user" => user_params}) do
-    # user = Accounts.get_user!(id)
     user = Guardian.Plug.current_resource(conn)
 
     with {:ok, %User{} = user} <- Accounts.update_user(user, user_params) do
       {:ok, token, _} = encode_and_sign(user)
       render(conn, "show.json", user: user, token: token)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-
-    with {:ok, %User{}} <- Accounts.delete_user(user) do
-      send_resp(conn, :no_content, "")
     end
   end
 
