@@ -129,7 +129,7 @@ defmodule RealworldPhoenix.ArticlesTest do
 
     test "get_article_by_slug/1 returns the article with slug" do
       article = article_fixture()
-      assert %Article{} = Articles.get_article_by_slug(article.slug)
+      assert %Article{} = Articles.get_article_by_slug!(article.slug)
     end
 
     test "create_article/1 with valid data creates a article" do

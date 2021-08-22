@@ -11,7 +11,6 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     body: "some body",
     description: "some description",
     favoritesCount: 42,
-    slug: "some slug",
     tagList: [],
     title: "some title"
   }
@@ -19,7 +18,6 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     body: "some updated body",
     description: "some updated description",
     favoritesCount: 43,
-    slug: "some updated slug",
     tagList: [],
     title: "some updated title"
   }
@@ -27,7 +25,6 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     body: nil,
     description: nil,
     favoritesCount: nil,
-    slug: nil,
     tagList: nil,
     title: nil
   }
@@ -40,17 +37,23 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
     password: "password"
   }
 
-  def fixture(:article, authorId, tags \\ []) do
+  def fixture(_kind, _attr \\ %{})
+
+  def fixture(:article, attrs) do
     {:ok, article} =
-      Map.update!(@create_attrs, :tagList, fn _ -> tags end)
-      |> Map.put(:author_id, authorId)
+      attrs
+      |> Enum.into(@create_attrs)
       |> Articles.create_article()
 
     article
   end
 
-  def fixture(:user) do
-    {:ok, user} = Accounts.create_user(@valid_user_attrs)
+  def fixture(:user, attrs) do
+    {:ok, user} =
+      attrs
+      |> Enum.into(@valid_user_attrs)
+      |> Accounts.create_user()
+
     user
   end
 
@@ -72,8 +75,8 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
                "author" => %{
                  "username" => "username",
                  "bio" => "bio",
-                 "image" => "image"
-                 #  "following" => _following
+                 "image" => "image",
+                 "following" => _following
                },
                "body" => _,
                "description" => _,
@@ -82,7 +85,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
                "title" => _,
                "createdAt" => _,
                "updatedAt" => _,
-               #  "favorited" => false,
+               "favorited" => false,
                "favoritesCount" => _
              } = List.first(articles)
     end
@@ -93,6 +96,18 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
       assert [
                %{
                  "tagList" => ["Elixir"]
+               }
+             ] = json_response(conn, 200)["articles"]
+    end
+
+    test "filtering by author", %{conn: conn} do
+      user = fixture(:user, %{username: "hoge"})
+      _ = fixture(:article, %{author_id: user.id})
+      conn = get(conn, Routes.article_path(conn, :index), author: "hoge")
+
+      assert [
+               %{
+                 "author" => %{"username" => "hoge"}
                }
              ] = json_response(conn, 200)["articles"]
     end
@@ -110,8 +125,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
       assert %{
                "body" => "some body",
                "description" => "some description",
-               "favoritesCount" => 42,
-               "slug" => "some slug",
+               "slug" => "some-title",
                "tagList" => [],
                "title" => "some title"
              } = json_response(conn, 200)["article"]
@@ -128,7 +142,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
 
     test "renders article when data is valid", %{
       conn: conn,
-      article: %Article{slug: id} = article
+      article: %Article{slug: id}
     } do
       conn = put(conn, Routes.article_path(conn, :update, id), article: @update_attrs)
       assert %{"slug" => id} = json_response(conn, 200)["article"]
@@ -138,8 +152,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
       assert %{
                "body" => "some updated body",
                "description" => "some updated description",
-               "favoritesCount" => 43,
-               "slug" => "some updated slug",
+               "slug" => "some-updated-title",
                "tagList" => [],
                "title" => "some updated title"
              } = json_response(conn, 200)["article"]
@@ -147,7 +160,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
 
     test "renders errors when data is invalid", %{
       conn: conn,
-      article: %Article{slug: id} = article
+      article: %Article{slug: id}
     } do
       conn = put(conn, Routes.article_path(conn, :update, id), article: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
@@ -157,7 +170,7 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   describe "delete article" do
     setup [:login, :create_article]
 
-    test "deletes chosen article", %{conn: conn, article: %Article{slug: id} = article} do
+    test "deletes chosen article", %{conn: conn, article: %Article{slug: id}} do
       conn = delete(conn, Routes.article_path(conn, :delete, id))
       assert response(conn, 204)
 
@@ -168,14 +181,14 @@ defmodule RealworldPhoenixWeb.ArticleControllerTest do
   end
 
   defp create_article(%{user: user}) do
-    article = fixture(:article, user.id)
+    article = fixture(:article, %{author_id: user.id})
     %{article: article}
   end
 
   defp create_articles(%{user: user}) do
     @tag_candinates
     |> Enum.each(fn tag ->
-      fixture(:article, user.id, [tag])
+      fixture(:article, %{tagList: [tag], author_id: user.id})
     end)
   end
 

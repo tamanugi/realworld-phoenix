@@ -40,15 +40,15 @@ defmodule RealworldPhoenixWeb.ArticleController do
   def show(conn, %{"slug" => slug}) do
     user = Guardian.Plug.current_resource(conn)
 
-    article =
-      Articles.get_article_by_slug(slug, user)
-      |> Articles.article_preload()
-
-    render(conn, "show.json", article: article)
+    with %Article{} = article <-
+           Articles.get_article_by_slug!(slug, user),
+         article <- article |> Articles.article_preload() do
+      render(conn, "show.json", article: article)
+    end
   end
 
   def update(conn, %{"slug" => slug, "article" => article_params}) do
-    article = Articles.get_article_by_slug(slug)
+    article = Articles.get_article_by_slug!(slug)
 
     with {:ok, %Article{} = article} <- Articles.update_article(article, article_params) do
       article =
@@ -60,7 +60,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
   end
 
   def delete(conn, %{"slug" => slug}) do
-    article = Articles.get_article_by_slug(slug)
+    article = Articles.get_article_by_slug!(slug)
 
     with {:ok, %Article{}} <- Articles.delete_article(article) do
       send_resp(conn, :no_content, "")
