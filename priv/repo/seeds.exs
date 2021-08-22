@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias RealworldPhoenix.Repo
+alias RealworldPhoenix.Articles
 alias RealworldPhoenix.Articles.Article
 alias RealworldPhoenix.Accounts.User
 
@@ -27,8 +28,7 @@ Repo.insert!(changeset)
 
 1..10
 |> Enum.each(fn i ->
-  article = %Article{
-    slug: "how-to-train-your-dragon-#{i}",
+  %{
     title: "How to train your dragon #{i}",
     description: "Ever wonder how?",
     body: "It takes a Jacobian",
@@ -36,6 +36,5 @@ Repo.insert!(changeset)
     favoritesCount: 0,
     author_id: user.id
   }
-
-  Repo.insert!(article)
+  |> Articles.create_article()
 end)
