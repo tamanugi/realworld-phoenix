@@ -16,6 +16,13 @@ defmodule RealworldPhoenix.Articles do
   @default_limit 20
   @default_offset 0
 
+  def article_preload(article_or_articles) do
+    article_or_articles
+    |> Repo.preload(:author)
+    |> Repo.preload(:favorites)
+    |> Repo.preload(:tagList)
+  end
+
   @doc """
   Returns the list of articles.
 

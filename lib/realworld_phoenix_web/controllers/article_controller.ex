@@ -3,7 +3,6 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
   alias RealworldPhoenix.Articles
   alias RealworldPhoenix.Articles.Article
-  alias RealworldPhoenix.Repo
 
   action_fallback RealworldPhoenixWeb.FallbackController
 
@@ -18,9 +17,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
     articles =
       Articles.list_articles(keywords)
-      |> Repo.preload(:author)
-      |> Repo.preload(:favorites)
-      |> Repo.preload(:tagList)
+      |> Articles.article_preload()
 
     render(conn, "index.json", articles: articles)
   end
@@ -31,9 +28,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
          {:ok, %Article{} = article} <- Articles.create_article(article_params) do
       article =
         article
-        |> Repo.preload(:author)
-        |> Repo.preload(:favorites)
-        |> Repo.preload(:tagList)
+        |> Articles.article_preload()
 
       conn
       |> put_status(:created)
@@ -47,9 +42,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
     article =
       Articles.get_article_by_slug(slug, user)
-      |> Repo.preload(:author)
-      |> Repo.preload(:favorites)
-      |> Repo.preload(:tagList)
+      |> Articles.article_preload()
 
     render(conn, "show.json", article: article)
   end
@@ -60,9 +53,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
     with {:ok, %Article{} = article} <- Articles.update_article(article, article_params) do
       article =
         article
-        |> Repo.preload(:author)
-        |> Repo.preload(:favorites)
-        |> Repo.preload(:tagList)
+        |> Articles.article_preload()
 
       render(conn, "show.json", article: article)
     end
@@ -83,9 +74,7 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
     articles =
       Articles.list_articles_feed(user, keywords)
-      |> Repo.preload(:author)
-      |> Repo.preload(:favorites)
-      |> Repo.preload(:tagList)
+      |> Articles.article_preload()
 
     render(conn, "index.json", articles: articles)
   end

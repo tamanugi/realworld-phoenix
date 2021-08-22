@@ -2,7 +2,6 @@ defmodule RealworldPhoenixWeb.FavoriteController do
   use RealworldPhoenixWeb, :controller
 
   alias RealworldPhoenix.Articles
-  alias RealworldPhoenix.Repo
   alias RealworldPhoenix.Articles.Favorite
   alias RealworldPhoenix.Articles.Article
 
@@ -15,9 +14,7 @@ defmodule RealworldPhoenixWeb.FavoriteController do
       # refech article data
       article =
         Articles.get_article_by_slug(slug, user)
-        |> Repo.preload(:author)
-        |> Repo.preload(:favorites)
-        |> Repo.preload(:tagList)
+        |> Articles.article_preload()
 
       conn
       |> put_status(:created)
@@ -29,9 +26,7 @@ defmodule RealworldPhoenixWeb.FavoriteController do
     with user <- Guardian.Plug.current_resource(conn),
          %Article{} = article <-
            Articles.get_article_by_slug(slug, user)
-           |> Repo.preload(:author)
-           |> Repo.preload(:favorites)
-           |> Repo.preload(:tagList),
+           |> Articles.article_preload(),
          {1, _} <- Articles.delete_favorite(user, article) |> IO.inspect() do
       conn
       |> render("show.json",
