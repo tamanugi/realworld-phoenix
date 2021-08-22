@@ -7,9 +7,6 @@ defmodule RealworldPhoenixWeb.ArticleController do
 
   action_fallback RealworldPhoenixWeb.FallbackController
 
-  @default_limit 20
-  @default_offset 0
-
   def index(conn, params) do
     keywords = for {key, val} <- params, do: {String.to_atom(key), val}
 
@@ -19,11 +16,8 @@ defmodule RealworldPhoenixWeb.ArticleController do
         user -> keywords |> Keyword.put(:user, user)
       end
 
-    limit = keywords |> Keyword.get(:limit, @default_limit)
-    offset = keywords |> Keyword.get(:offset, @default_offset)
-
     articles =
-      Articles.list_articles(keywords, limit, offset)
+      Articles.list_articles(keywords)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
       |> Repo.preload(:tagList)
@@ -83,13 +77,12 @@ defmodule RealworldPhoenixWeb.ArticleController do
   end
 
   def feed(conn, params) do
-    limit = Map.get(params, "limit", @default_limit)
-    offset = Map.get(params, "offset", @default_offset)
+    keywords = for {key, val} <- params, do: {String.to_atom(key), val}
 
     user = Guardian.Plug.current_resource(conn)
 
     articles =
-      Articles.list_articles_feed(user, limit, offset)
+      Articles.list_articles_feed(user, keywords)
       |> Repo.preload(:author)
       |> Repo.preload(:favorites)
       |> Repo.preload(:tagList)

@@ -11,21 +11,19 @@ defmodule RealworldPhoenix.Articles do
   alias RealworldPhoenix.Accounts.User
   alias RealworldPhoenix.Articles.Favorite
   alias RealworldPhoenix.Articles.Tag
-
   alias RealworldPhoenix.Profiles.FollowRelated
 
-  # require Kernel
+  @default_limit 20
+  @default_offset 0
 
   @doc """
   Returns the list of articles.
 
-  ## Examples
-
-      iex> list_articles()
-      [%Article{}, ...]
-
   """
-  def list_articles(params \\ [], limit \\ 20, offset \\ 0) do
+  def list_articles(params \\ []) do
+    {limit, params} = params |> Keyword.pop(:limit, @default_limit)
+    {offset, params} = params |> Keyword.pop(:offset, @default_offset)
+
     from(a in Article)
     |> article_where(params)
     |> limit(^limit)
@@ -34,7 +32,10 @@ defmodule RealworldPhoenix.Articles do
     |> Repo.all()
   end
 
-  def list_articles_feed(user, limit \\ 20, offset \\ 0) do
+  def list_articles_feed(user, params \\ []) do
+    {limit, params} = params |> Keyword.pop(:limit, @default_limit)
+    {offset, _} = params |> Keyword.pop(:offset, @default_offset)
+
     from(a in Article,
       inner_join: f in Favorite,
       on: a.id == f.article_id,
@@ -224,8 +225,6 @@ defmodule RealworldPhoenix.Articles do
   end
 
   def comment_following(query, _), do: query
-
-  alias RealworldPhoenix.Articles.Favorite
 
   def create_favorite(%User{} = user, %Article{} = article) do
     %Favorite{}
