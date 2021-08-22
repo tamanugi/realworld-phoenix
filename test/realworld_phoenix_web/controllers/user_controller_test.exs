@@ -2,9 +2,6 @@ defmodule RealworldPhoenixWeb.UserControllerTest do
   use RealworldPhoenixWeb.ConnCase
 
   alias RealworldPhoenix.Accounts
-  alias RealworldPhoenix.Accounts.User
-
-  import RealworldPhoenix.Guardian
 
   @create_attrs %{
     email: "some email",
