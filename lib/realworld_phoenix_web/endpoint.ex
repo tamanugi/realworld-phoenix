@@ -50,5 +50,8 @@ defmodule RealworldPhoenixWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  plug RealworldPhoenixWeb.CORS
+
   plug RealworldPhoenixWeb.Router
 end
