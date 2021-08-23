@@ -13,18 +13,17 @@
 alias RealworldPhoenix.Repo
 alias RealworldPhoenix.Articles
 alias RealworldPhoenix.Articles.Article
+
+alias RealworldPhoenix.Accounts
 alias RealworldPhoenix.Accounts.User
 
-user = %User{
-  email: "hoge@example.com",
-  username: "username",
-  password: "password"
-}
-
-changeset =
-  User.changeset(%User{}, %{email: "hoge@xample.com", username: "username", password: "password"})
-
-Repo.insert!(changeset)
+{:ok, user} =
+  %{
+    email: "hoge@example.com",
+    username: "username",
+    password: "password"
+  }
+  |> Accounts.create_user()
 
 1..10
 |> Enum.each(fn i ->
