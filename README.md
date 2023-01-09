@@ -33,7 +33,7 @@ $ mix deps.get
 $ mix ecto.setup
 
 # Start Phoenix endpoint with `mix phx.server`
-$ mix phx.serer
+$ mix phx.server
 ```
 
 # Test
