@@ -27,6 +27,7 @@ To get started, run the following commands in your project folder
 $ docker-compose up -d
 
 # Install dependencies
+$ mix deps.update --all
 $ mix deps.get
 
 # Create and migrate your database
